@@ -1,0 +1,22 @@
+*&---------------------------------------------------------------------*
+*& Report ZMULTIPLE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZMULTIPLE.
+
+DATA v_matnr TYPE makt-matnr.
+
+TYPES : BEGIN OF ty_makt,
+  matnr TYPE makt-matnr,
+  spras TYPE makt-spras,
+  maktx TYPE makt-maktx,
+  END OF ty_makt.
+
+DATA st_makt TYPE ty_makt.
+
+  v_matnr = '56'.
+  WRITE v_matnr.
+
+  st_makt-matnr = '45'.
+  WRITE st_makt-matnr.

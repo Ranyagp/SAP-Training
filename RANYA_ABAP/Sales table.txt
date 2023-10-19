@@ -1,0 +1,65 @@
+*&---------------------------------------------------------------------*
+*& Report ZSALES
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZSALES.
+
+PARAMETERS p_vbeln TYPE vbak-vbeln.
+
+TYPES : BEGIN OF ty_vbak,
+        vbeln TYPE vbak-vbeln,
+        audat TYPE vbak-audat,
+        netwr TYPE vbak-netwr,
+        kunnr type vbak-kunnr,
+        END OF ty_vbak.
+
+TYPES : BEGIN OF ty_vbap,
+        posnr TYPE vbap-posnr,
+        matnr TYPE vbap-matnr,
+        arktx TYPE vbap-matnr,
+        kwmeng TYPE vbap-kwmeng,
+        zieme TYPE vbap-zieme,
+        netwr TYPE vbap-netwr,
+        END OF ty_vbap.
+
+DATA st_vbak TYPE ty_vbak.
+DATA st_vbap TYPE ty_vbap.
+DATA v_name1 TYPE kna1-name1.
+DATA v_msehl TYPE t006a-msehl.
+
+*WRITE : / 'DOcuemnet Number:',st_vbak-vbeln,
+*        / 'Docuement Date',st_vbak-audat,
+*        / 'Net-Value',st_vbak-netwr,
+*        / 'sold to party',st_vbak-kunnr.
+*
+*WRITE : / 'ITEM',
+*        'MATERIAL',
+*         'ITEM DESCRIPTION',
+*     'ORDER QTY',
+*        'UOM',
+*         'NET-VALUE'.
+
+
+
+SELECT SINGLE vbeln audat netwr kunnr  FROM vbak INTO st_vbak WHERE vbeln EQ p_vbeln.
+
+SELECT SINGLE name1 FROM kna1 INTO v_name1 WHERE kunnr EQ st_vbak-kunnr.
+WRITE : / st_vbak-vbeln,
+          st_vbak-audat,
+          st_vbak-netwr,
+          st_vbak-kunnr,
+          v_name1.
+
+
+SELECT posnr matnr arktx kwmeng zieme netwr FROM vbap INTO st_vbap WHERE vbeln EQ P_vbeln.
+SELECT SINGLE msehl FROM t006a INTO v_msehl WHERE spras EQ sy-langu AND msehi EQ st_vbap-zieme .
+
+
+WRITE : / st_vbap-posnr,
+          st_vbap-matnr,
+          st_vbap-arktx,
+          st_vbap-kwmeng,
+          v_msehl,
+          st_vbap-netwr.
+ENDSELECT.

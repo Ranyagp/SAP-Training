@@ -1,0 +1,66 @@
+*&---------------------------------------------------------------------*
+*& Report ZTYPES_INTERNAL
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZTYPES_INTERNAL.
+
+TYPES : BEGIN OF ty_makt,
+        matnr TYPE makt-matnr,
+        spras TYPE makt-spras,
+        maktx TYPE makt-maktx,
+  END OF ty_makt.
+
+*DATA : it_makt TYPE STANDARD TABLE OF ty_makt,
+*       wa_makt LIKE LINE OF it_makt.
+*
+*wa_makt-matnr = '100'.
+*wa_makt-spras = 'E'.
+*wa_makt-maktx = 'Pen'.
+*APPEND wa_makt TO it_makt.
+*
+*wa_makt-matnr = '200'.
+*wa_makt-spras = 'E'.
+*wa_makt-maktx = 'Pencil'.
+*APPEND wa_makt TO it_makt.
+*
+*wa_makt-matnr = '200'.
+*wa_makt-spras = 'D'.
+*wa_makt-maktx = 'Pencil'.
+*APPEND wa_makt TO it_makt.
+*
+*wa_makt-matnr = '300'.
+*wa_makt-spras = 'E'.
+*wa_makt-maktx = 'Book'.
+*APPEND wa_makt TO it_makt.
+*
+*wa_makt-matnr = '500'.
+*wa_makt-spras = 'E'.
+*wa_makt-maktx = 'Pen Holder'.
+*APPEND wa_makt TO it_makt.
+*
+*WRITE : wa_makt.
+*
+  DATA :it_makt TYPE  SORTED TABLE OF ty_makt WITH UNIQUE KEY matnr spras,
+        wa_makt LIKE LINE OF it_makt.
+
+  wa_makt-matnr = '100'.
+  wa_makt-spras = 'E'.
+  wa_makt-maktx ='Pencil'.
+  INSERT wa_makt INTO TABLE it_makt.
+
+  wa_makt-matnr = '300'.
+  wa_makt-spras = 'D'.
+  wa_makt-maktx ='Pencil'.
+  INSERT wa_makt INTO TABLE it_makt.
+
+   wa_makt-matnr = '200'.
+  wa_makt-spras = 'E'.
+  wa_makt-maktx ='Pencil'.
+ INSERT wa_makt INTO TABLE it_makt.
+
+*SORT it_makt by matnr spras.
+
+*READ TABLE it_makt INTO wa_makt INDEX 4.
+READ TABLE it_makt INTO wa_makt WITH KEY matnr = '200'.
+WRITE : wa_makt.

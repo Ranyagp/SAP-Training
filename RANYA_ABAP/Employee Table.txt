@@ -1,0 +1,27 @@
+*&---------------------------------------------------------------------*
+*& Report ZEMP_REPORT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZEMP_REPORT2.
+
+TYPES : BEGIN OF ty_zranya_makt,
+        STDID TYPE zranya_makt-stdid,
+        STDNAME TYPE zranya_makt-STDNAME,
+        STDSALARY TYPE zranya_makt-STDSALARY,
+        DCODE TYPE zranya_makt-DCODE,
+  END OF ty_zranya_makt.
+
+  DATA : st_zranya_makt TYPE ty_zranya_makt.
+  DATA : v_deptdescrp TYPE zdept_makt-deptdescrp.
+
+
+PARAMETERS p_STDID TYPE zranya_makt-STDID.
+
+  SELECT  SINGLE STDID STDNAME STDSALARY DCODE FROM zranya_makt INTO st_zranya_makt WHERE STDID EQ p_STDID.
+*   SELECT SINGLE deptdescrp FROM zdept_makt INTO v_deptdescrp WHERE dcode EQ st_zdept_makt-dcode.
+
+    WRITE :/ st_zranya_makt-stdid,
+            st_zranya_makt-STDNAME,
+            st_zranya_makt-STDSALARY,
+            st_zranya_makt-DCODE.

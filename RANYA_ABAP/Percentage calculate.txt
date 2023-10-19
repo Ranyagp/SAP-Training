@@ -1,0 +1,43 @@
+*&---------------------------------------------------------------------*
+*& Report ZPERCENTAGE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPERCENTAGE.
+
+*PARAMETERS : p_amount TYPE p,
+*             p_profit TYPE p,
+*             p_days TYPE i.
+*
+*DATA v_total TYPE p DECIMALS 2.
+*
+*v_total = ( p_amount * p_profit * p_days ) / 100.
+*
+*WRITE : / 'Initial amount :',p_amount,
+*       / 'Profit percentage :',p_profit,
+*       / 'total amount :',v_total.
+
+PARAMETERS : p_amt TYPE p DECIMALS 2,
+             p_profit TYPE p DECIMALS 2,
+             p_days TYPE i,
+             p_check AS CHECKBOX.
+
+DATA :   fin_amt TYPE p DECIMALS 2,
+         intr_amt TYPE p DECIMALS 2.
+
+ IF p_check EQ 'X'.
+ intr_amt = p_amt * ( p_profit / 100 ) * ( p_days ) .
+      fin_amt = p_amt + intr_amt.
+
+
+    ELSE.
+      fin_amt = p_amt.
+     DO p_days TIMES.
+    intr_amt = fin_amt * p_profit / 100.
+    fin_amt = fin_amt + intr_amt.
+    ENDDO.
+      ENDIF.
+
+      WRITE :  'Initial Amount:',p_amt,/
+               'Total Days:',p_days,/
+               'Total Amount:',fin_amt.

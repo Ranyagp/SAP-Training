@@ -1,0 +1,42 @@
+*&---------------------------------------------------------------------*
+*& Report ZABAP_PROGRAM
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZABAP_PROGRAM.
+
+DATA v_name type c LENGTH 20.
+v_name = 'RANYA'.
+WRITE :/ v_name.
+
+DATA num TYPE n LENGTH 10.
+NUM = '678954'.
+WRITE :/ num.
+
+DATA time TYPE t.
+time = '54530'.
+WRITE :/ time.
+
+DATA q TYPE i.
+q = '24.56'.
+WRITE :/ q.
+
+DATA date TYPE D.
+date  = '20231010'.
+WRITE :/ date.
+
+DATA dec TYPE p DECIMALS 10.
+dec ='475.654'.
+WRITE :/ dec.
+
+DATA float TYPE f.
+float = '6789'.
+WRITE :/ float.
+
+DATA hexa TYPE X LENGTH 5.
+hexa = '12346788964578'.
+WRITE :/ hexa.
+
+DATA name TYPE string .
+name = 'Banglore'.
+WRITE :/ name.
