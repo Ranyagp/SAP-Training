@@ -1,0 +1,29 @@
+*&---------------------------------------------------------------------*
+*& Report ZRANZ_OO_CONSTRUCTOR
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRANZ_OO_CONSTRUCTOR.
+
+CLASS lcl_employee DEFINITION.
+  PUBLIC SECTION.
+  DATA emp_id TYPE c LENGTH 5.
+  METHODS get_salary EXPORTING ex_sal TYPE i.
+  ENDCLASS.
+
+  CLASS lcl_employee IMPLEMENTATION.
+    METHOD get_salary.
+     "SELECT SINGLE salary FROM emp_table INTO ex_sal WHERE empid = emp_id.
+     ENDMETHOD.
+  ENDCLASS.
+
+  DATA o_ranz TYPE REF TO lcl_employee.
+  DATA v_salary TYPE i.
+  START-OF-SELECTION.
+  CREATE OBJECT o_ranz.
+
+  o_ranz->get_salary(
+
+  IMPORTING
+    ex_sal = v_salary
+  ).

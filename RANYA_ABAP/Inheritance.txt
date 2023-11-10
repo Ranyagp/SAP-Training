@@ -1,0 +1,22 @@
+*&---------------------------------------------------------------------*
+*& Report ZRANZ_OO_INHERITANCE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRANZ_OO_INHERITANCE.
+
+DATA : o_super TYPE REF TO zcl_ranz_super,
+       o_sub TYPE REF TO zcl_ranz_sub.
+
+CREATE OBJECT : o_super, o_sub.
+
+o_super->get_mileage( ).
+o_sub->get_mileage( ).
+o_sub->get_seats( ).
+
+o_super = o_sub.
+*o_sub = o_super.
+o_super->get_mileage( ).
+o_sub ?= o_super.
+
+WRITE 'end'.
