@@ -1,0 +1,59 @@
+*&---------------------------------------------------------------------*
+*& Report ZSALE_FM1
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZSALE_FM1.
+DATA: it_vbak TYPE zranz_t_vbak,
+      wa_vbak LIKE LINE OF it_vbak,
+      it_vbap TYPE zranz_t_vbap,
+      wa_vbap LIKE LINE OF it_vbap,
+      it_t006a TYPE zranz_t_t006a,
+      wa_t006a LIKE LINE OF it_t006a,
+      it_kna1 TYPE zranz_t_kna1,
+      wa_kna1 LIKE LINE OF it_kna1,
+      it_header TYPE zranz_t_header,
+      wa_header LIKE LINE OF it_header,
+      it_item type zranz_t_item,
+      wa_item LIKE LINE OF it_item.
+
+select-OPTIONS p_vbeln FOR wa_header-vbeln.
+START-OF-SELECTION.
+CALL FUNCTION 'ZSALES_FM'
+  EXPORTING
+    p_vbeln         = p_vbeln[]
+ IMPORTING
+   EX_HEADER       = it_header
+          .
+end-of-SELECTION.
+
+CALL FUNCTION 'ZSALES_FM1'
+  EXPORTING
+    im_header_detail       = it_header
+          .
+
+AT LINE-SELECTION.
+
+  DATA: fnam(20), fval(40).
+  DATA v_vbeln TYPE vbap-vbeln.
+
+  GET CURSOR FIELD fnam VALUE fval.
+
+  CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+    EXPORTING
+      input         = fval
+   IMPORTING
+     OUTPUT        = v_vbeln
+            .
+
+  CALL FUNCTION 'ZSALE_FM2'
+    EXPORTING
+      im_v_vbeln       = v_vbeln
+   IMPORTING
+     EX_ITEM          = it_item
+
+            .
+  CALL FUNCTION 'ZSALE_FM3'
+    EXPORTING
+      it_item_details       = it_item
+            .

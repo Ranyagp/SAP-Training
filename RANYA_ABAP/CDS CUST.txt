@@ -1,0 +1,88 @@
+*&---------------------------------------------------------------------*
+*& Report ZRAN_CDS_CUST
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRAN_CDS_CUST.
+
+
+DATA V_KUNNR type KUNNR.
+
+DATA o_ranges_coll TYPE ref to cl_salv_range_tab_collector.
+
+DATA: it_listheader TYPE slis_t_listheader,
+      wa_listheader TYPE slis_listheader.
+
+DATA : it_KNA1 TYPE  TABLE OF zranz_asses_st,
+       wa_KNA1 TYPE            zranz_asses_st,
+       it_knbm TYPE TABLE OF znoor_KNBM,
+       wa_knbm TYPE          znoor_KNBM.
+
+SELEct-OPTIONS S_KUNNR for v_KUNNR DEFAULT '1000' to '2000'.
+
+create OBJECT o_ranges_coll.
+
+call METHOD CL_SALV_GUI_TABLE_IDA=>create_for_cds_view
+  EXPORTING
+    iv_cds_view_name      = 'ZRAN_CDS_CUST'
+*    io_gui_container      =
+*    io_calc_field_handler =
+  RECEIVING
+    ro_alv_gui_table_ida  =  data(o_alv)
+  .
+
+ call METHOD o_ranges_coll->add_ranges_for_name(      "repeate it for each range
+    iv_name   = 'KUNNR'
+    it_ranges =  S_KUNNR[]
+  ).
+ o_ranges_coll->get_collected_ranges(
+   IMPORTING
+     et_named_ranges = data(it_all_ranges)
+ ).
+ o_alv->set_select_options(
+   it_ranges    =  it_all_ranges
+*   io_condition =
+ ).
+call METHOD o_alv->fullscreen
+  RECEIVING
+    ro_fullscreen = data(o_full_screen)
+  .
+call METHOD o_full_screen->display.
+AT LINE-SELECTION.
+   SELECT
+    kunnr
+    bukrs
+    witht
+    "wt_exrt
+
+   FROM Znoor_knbm INTO TABLE IT_knbm WHERE  kunnr = wa_kna1-kunnr.
+
+  IF it_knbm IS NOT INITIAL.
+    ULINE.
+    WRITE : / sy-vline,'CLIENT' COLOR 1, 20 sy-vline,
+             'DATE' COLOR 1  , 40 sy-vline,
+             'USER' COLOR 1  , 60 sy-vline,
+             'TIME' COLOR 1  , 80 sy-vline .
+uline.
+    WRITE : /	  sy-vline,syst-mandt  ,20 sy-vline,
+                sy-datum    ,40 sy-vline,
+                SYst-uname  ,60 sy-vline,
+                Syst-uzeit  ,80 sy-vline.
+    ULINE.
+    SKIP 2 .
+    ULINE.
+    WRITE : /  sy-vline,'KUNNR' COLOR 1 ,  20 sy-vline,
+               'BUKRS' COLOR 1 ,  40 sy-vline,
+               'WITHT' COLOR 1 ,  60 sy-vline,
+               'WT_EXRT' COLOR 1 ,80 sy-vline.
+uline.
+    LOOP AT IT_knbm INTO WA_knbm.
+
+
+      WRITE : / sy-vline,WA_knbm-kunnr ,  20 sy-vline,
+                WA_knbm-bukrs ,  40 sy-vline,
+                WA_knbm-witht ,  60 sy-vline,
+                WA_knbm-wt_exrt ,80 sy-vline.
+      ULINE.
+    ENDLOOP.
+    endif.

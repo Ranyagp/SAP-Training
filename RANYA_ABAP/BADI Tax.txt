@@ -1,0 +1,15 @@
+*&---------------------------------------------------------------------*
+*& Report ZRAN_BADI_TAX
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRAN_BADI_TAX.
+
+DATA o_badi TYPE REF TO ZRAN_BADIDEF.
+PARAMETERS v_value type i.
+GET BADI o_badi.
+call badi o_badi->cal_tax
+  EXPORTING
+    v_val   = v_value
+
+  .

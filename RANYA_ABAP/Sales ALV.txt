@@ -1,0 +1,237 @@
+*&---------------------------------------------------------------------*
+*& Report ZSALES_ALV
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZSALES_ALV.
+
+DATA : it_vbak     TYPE zranz_t_vbak,
+       wa_vbak     LIKE LINE OF it_vbak,
+       it_kna1     TYPE zranz_t_kna1,
+       wa_kna1     LIKE LINE OF it_kna1,
+       it_vbap     TYPE zranz_t_vbap,
+       wa_vbap     LIKE LINE OF it_vbap,
+       it_t006a    TYPE zranz_t_t006a,
+       wa_t006a    LIKE LINE OF it_t006a,
+        it_header   TYPE zranz_t_header,
+       wa_header   LIKE LINE OF it_header,
+       it_item     TYPE zranz_t_item,
+       wa_item     LIKE LINE OF it_item,
+       it_fieldcat TYPE slis_t_fieldcat_alv,
+       it_fcat     TYPE slis_t_fieldcat_alv.
+*       v_vbeln TYPE vbak-vbeln.
+
+*DATA fs_layout type slis_layout_alv.
+*fs_layout-zebra = 'X'.
+
+SELECT-OPTIONS s_num FOR wa_vbak-vbeln.
+
+PERFORM get_header.
+
+PERFORM display_header1.
+
+*&---------------------------------------------------------------------*
+*& Form get_header
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM get_header .
+
+  SELECT vbeln audat netwr kunnr FROM vbak INTO TABLE it_vbak WHERE vbeln IN s_num.
+  SELECT kunnr name1 FROM kna1 INTO TABLE it_kna1 FOR ALL ENTRIES IN it_vbak WHERE kunnr EQ it_vbak-kunnr.
+  LOOP AT it_vbak INTO wa_vbak.
+    READ TABLE it_kna1 INTO wa_kna1 WITH KEY kunnr = wa_vbak-kunnr.
+    MOVE-CORRESPONDING wa_vbak TO wa_header.
+    MOVE-CORRESPONDING wa_kna1 TO wa_header.
+    APPEND wa_header TO it_header.
+    CLEAR wa_header.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display_header1
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_header1 .
+
+DATA lw_fieldcat LIKE LINE OF it_fieldcat.
+  lw_fieldcat-col_pos = 1.
+  lw_fieldcat-fieldname = 'VBELN'.
+  lw_fieldcat-tabname = 'IT_HEADER'.
+  lw_fieldcat-seltext_m = 'Document No.'.
+  lw_fieldcat-outputlen = 20.
+  APPEND lw_fieldcat TO it_fieldcat.
+
+  lw_fieldcat-col_pos = 2.
+  lw_fieldcat-fieldname = 'AUDAT'.
+  lw_fieldcat-tabname = 'IT_HEADER'.
+  lw_fieldcat-seltext_m = 'Document Date'.
+  lw_fieldcat-outputlen = 20.
+  APPEND lw_fieldcat TO it_fieldcat.
+
+  lw_fieldcat-col_pos = 3.
+  lw_fieldcat-fieldname = 'NETWR'.
+  lw_fieldcat-tabname = 'IT_HEADER'.
+  lw_fieldcat-seltext_m = 'NetValue'.
+  lw_fieldcat-outputlen = 20.
+  APPEND lw_fieldcat TO it_fieldcat.
+
+  lw_fieldcat-col_pos = 4.
+  lw_fieldcat-fieldname = 'NAME1'.
+  lw_fieldcat-tabname = 'IT_HEADER'.
+  lw_fieldcat-seltext_m = 'Sold To Party'.
+  lw_fieldcat-outputlen = 40.
+  APPEND lw_fieldcat TO it_fieldcat.
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+ EXPORTING
+*     I_INTERFACE_CHECK              = ' '
+*     I_BYPASSING_BUFFER             =
+*     I_BUFFER_ACTIVE                = ' '
+     I_CALLBACK_PROGRAM             = 'ZSALES_ALV'
+*     I_CALLBACK_PF_STATUS_SET       = 'pf_status'
+     I_CALLBACK_USER_COMMAND        = 'USER-COMMAND'
+*     I_STRUCTURE_NAME               =
+*     IS_LAYOUT                      = fs_layout
+     IT_FIELDCAT                    = it_fieldcat
+*     IT_EXCLUDING                   =
+*     IT_SPECIAL_GROUPS              =
+*     IT_SORT                        =
+*     IT_FILTER                      =
+*     IS_SEL_HIDE                    =
+*     I_DEFAULT                      = 'X'
+*     I_SAVE                         = ' '
+*     IS_VARIANT                     =
+*     IT_EVENTS                      =
+*     IT_EVENT_EXIT                  =
+*     IS_PRINT                       =
+*     IS_REPREP_ID                   =
+*     I_SCREEN_START_COLUMN          = 0
+*     I_SCREEN_START_LINE            = 0
+*     I_SCREEN_END_COLUMN            = 0
+*     I_SCREEN_END_LINE              = 0
+*     IR_SALV_LIST_ADAPTER           =
+*     IT_EXCEPT_QINFO                =
+*     I_SUPPRESS_EMPTY_DATA          = ABAP_FALSE
+*     IO_SALV_ADAPTER                =
+*   IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER        =
+*     ES_EXIT_CAUSED_BY_USER         =
+    TABLES
+      t_outtab                       = it_header
+   EXCEPTIONS
+     PROGRAM_ERROR                  = 1
+     OTHERS                         = 2
+            .
+
+
+ENDFORM.
+
+FORM USER-COMMAND USING r_ucomm LIKE sy-ucomm
+                                   rs_selfield TYPE slis_selfield.
+  IF r_ucomm EQ '&IC1' AND rs_selfield-fieldname EQ 'VBELN'.
+
+    CLEAR it_item.
+    SELECT vbeln posnr pstyv arktx kwmeng zieme netwr FROM vbap INTO TABLE it_vbap WHERE vbeln EQ rs_selfield-value.
+    SELECT msehi msehl FROM t006a INTO TABLE it_t006a FOR ALL ENTRIES IN it_vbap WHERE msehi EQ it_vbap-zieme AND spras EQ sy-langu.
+    LOOP AT it_vbap INTO wa_vbap.
+      READ TABLE it_t006a INTO wa_t006a WITH KEY msehi = wa_vbap-zieme.
+      MOVE-CORRESPONDING wa_vbap TO wa_item.
+      MOVE-CORRESPONDING wa_t006a TO wa_item.
+      APPEND wa_item TO it_item.
+      CLEAR wa_item.
+    ENDLOOP.
+
+    CLEAR it_fcat.
+    DATA : lw_fcat LIKE LINE OF it_fcat.
+    lw_fcat-col_pos = 1.
+
+    lw_fcat-fieldname = 'POSNR'.
+    lw_fcat-tabname = 'IT_ITEM'.
+    lw_fcat-seltext_m = ' Item No.'.
+    lw_fcat-outputlen = 20.
+    APPEND lw_fcat TO it_fcat.
+
+    lw_fcat-col_pos = 2.
+    lw_fcat-fieldname = 'PSTYV'.
+    lw_fcat-tabname = 'IT_ITEM'.
+    lw_fcat-seltext_m = 'Material Type'.
+    lw_fcat-outputlen = 20.
+    APPEND lw_fcat TO it_fcat.
+
+    lw_fcat-col_pos = 3.
+    lw_fcat-fieldname = 'ARKTX'.
+    lw_fcat-tabname = 'IT_ITEM'.
+    lw_fcat-seltext_m = ' Item Description'.
+    lw_fcat-outputlen = 20.
+    APPEND lw_fcat TO it_fcat.
+
+    lw_fcat-col_pos = 4.
+    lw_fcat-fieldname = 'KWMENG'.
+    lw_fcat-tabname = 'IT_ITEM'.
+    lw_fcat-seltext_m = ' Order Qty'.
+    lw_fcat-outputlen = 20.
+    APPEND lw_fcat TO it_fcat.
+
+    lw_fcat-col_pos = 5.
+    lw_fcat-fieldname = 'MSEHL'.
+    lw_fcat-tabname = 'IT_ITEM'.
+    lw_fcat-seltext_m = 'UoM'.
+    lw_fcat-outputlen = 20.
+    APPEND lw_fcat TO it_fcat.
+
+    lw_fcat-col_pos = 6.
+    lw_fcat-fieldname = 'NETWR'.
+    lw_fcat-tabname = 'IT_ITEM'.
+    lw_fcat-seltext_m = ' NetValue'.
+    lw_fcat-outputlen = 20.
+    APPEND lw_fcat TO it_fcat.
+
+   CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+*      I_INTERFACE_CHECK              = ' '
+*      I_BYPASSING_BUFFER             =
+*      I_BUFFER_ACTIVE                = ' '
+     I_CALLBACK_PROGRAM             = 'ZSALES_ALV'
+*      I_CALLBACK_PF_STATUS_SET       = 'pf_status'
+*      I_CALLBACK_USER_COMMAND        = 'user_command'
+*      I_STRUCTURE_NAME               =
+*      IS_LAYOUT                      = fs_layout
+      IT_FIELDCAT                    = it_fcat
+*      IT_EXCLUDING                   =
+*      IT_SPECIAL_GROUPS              =
+*      IT_SORT                        =
+*      IT_FILTER                      =
+*      IS_SEL_HIDE                    =
+*      I_DEFAULT                      = 'X'
+*      I_SAVE                         = ' '
+*      IS_VARIANT                     =
+*      IT_EVENTS                      =
+*      IT_EVENT_EXIT                  =
+*      IS_PRINT                       =
+*      IS_REPREP_ID                   =
+*      I_SCREEN_START_COLUMN          = 0
+*      I_SCREEN_START_LINE            = 0
+*      I_SCREEN_END_COLUMN            = 0
+*      I_SCREEN_END_LINE              = 0
+*      IR_SALV_LIST_ADAPTER           =
+*      IT_EXCEPT_QINFO                =
+*      I_SUPPRESS_EMPTY_DATA          = ABAP_FALSE
+*      IO_SALV_ADAPTER                =
+*    IMPORTING
+*      E_EXIT_CAUSED_BY_CALLER        =
+*      ES_EXIT_CAUSED_BY_USER         =
+     TABLES
+       t_outtab                       = it_item
+    EXCEPTIONS
+      PROGRAM_ERROR                  = 1
+      OTHERS                         = 2
+             .
+   ENDIF.
+ENDFORM.

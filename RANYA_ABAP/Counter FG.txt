@@ -1,0 +1,24 @@
+*&---------------------------------------------------------------------*
+*& Report ZTASK2_FUNCTION
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZTASK2_FUNCTION.
+
+  data: it_makt TYPE zdemo_tb_makt,
+        wa_makt like LINE OF it_makt.
+
+  SELECT-OPTIONS s_num for wa_makt-MATNR.
+
+CALL FUNCTION 'ZTASK2'
+  EXPORTING
+    s_num         = s_num[]
+ IMPORTING
+   EX_MAKT       = it_makt
+          .
+
+ loop at it_makt into wa_makt.
+      WRITE:/ wa_makt-matnr,
+              wa_makt-spras,
+              wa_makt-maktx.
+      ENDLOOP.

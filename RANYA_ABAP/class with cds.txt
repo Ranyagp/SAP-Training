@@ -1,0 +1,43 @@
+*&---------------------------------------------------------------------*
+*& Report ZRANZ_IDA
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZRANZ_IDA.
+
+*cl_salv_gui_table_ida=>create_for_cds_view('zranz_cds')->fullscreen( )->display( ).
+
+
+CLASS ranz DEFINITION.
+
+  PUBLIC SECTION.
+
+    CLASS-METHODS create
+      RETURNING
+        VALUE(r_result) TYPE REF TO ranz.
+
+
+    METHODS run.
+
+ENDCLASS.
+
+
+CLASS ranz IMPLEMENTATION.
+  METHOD create.
+    CREATE OBJECT r_result.
+
+  ENDMETHOD.
+  METHOD run.
+
+    cl_salv_gui_table_ida=>create_for_cds_view(`zranz_cds`)->fullscreen( )->display( ).
+  ENDMETHOD.
+ENDCLASS.
+
+START-OF-SELECTION.
+  PERFORM get_display.
+END-OF-SELECTION.
+
+FORM get_display.
+  ranz=>create( )->run( ).
+
+ENDFORM.
